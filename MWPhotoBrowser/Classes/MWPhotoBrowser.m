@@ -186,6 +186,7 @@
     }
     if (self.displayActionButton) {
         _actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(actionButtonPressed:)];
+        _actionButton.tintColor = [UIColor whiteColor];
     }
     
     // Update
@@ -253,12 +254,12 @@
     NSMutableArray *items = [[NSMutableArray alloc] init];
 
     // Left button - Grid
-    if (_enableGrid) {
-        hasItems = YES;
-        NSString *buttonName = @"UIBarButtonItemGrid";
-        if (SYSTEM_VERSION_LESS_THAN(@"7")) buttonName = @"UIBarButtonItemGridiOS6";
-        [items addObject:[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:[NSString stringWithFormat:@"MWPhotoBrowser.bundle/images/%@.png", buttonName]] style:UIBarButtonItemStylePlain target:self action:@selector(showGridAnimated)]];
+    if (_actionButton && !(!hasItems && !self.navigationItem.rightBarButtonItem)) {
+        [items addObject:_actionButton];
     } else {
+        // We're not showing the toolbar so try and show in top right
+        if (_actionButton)
+            self.navigationItem.rightBarButtonItem = _actionButton;
         [items addObject:fixedSpace];
     }
 
@@ -275,14 +276,15 @@
     }
 
     // Right - Action
-    if (_actionButton && !(!hasItems && !self.navigationItem.rightBarButtonItem)) {
-        [items addObject:_actionButton];
+    if (_enableGrid) {
+        hasItems = YES;
+        NSString *buttonName = @"UIBarButtonItemGrid";
+        if (SYSTEM_VERSION_LESS_THAN(@"7")) buttonName = @"UIBarButtonItemGridiOS6";
+        [items addObject:[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:[NSString stringWithFormat:@"MWPhotoBrowser.bundle/images/%@.png", buttonName]] style:UIBarButtonItemStylePlain target:self action:@selector(showGridAnimated)]];
     } else {
-        // We're not showing the toolbar so try and show in top right
-        if (_actionButton)
-            self.navigationItem.rightBarButtonItem = _actionButton;
         [items addObject:fixedSpace];
     }
+
 
     // Toolbar visibility
     [_toolbar setItems:items];
